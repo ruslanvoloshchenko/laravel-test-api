@@ -73,3 +73,10 @@ You can test the API endpoint using `curl`:
 curl -X POST http://127.0.0.1:8000/api/submit \
      -H "Content-Type: application/json" \
      -d '{"name":"John Doe", "email":"john.doe@example.com", "message":"This is a test message."}'
+```
+
+### Using Unit test
+```sh
+php artisan test
+```
+
