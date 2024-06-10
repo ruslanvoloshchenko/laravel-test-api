@@ -26,7 +26,6 @@ class SubmitEndpointTest extends TestCase
 
         // Send a POST request to the /submit endpoint
         $response = $this->postJson('/api/submit', $payload);
-
         // Assert the response status
         $response->assertStatus(200)
             ->assertJson([
