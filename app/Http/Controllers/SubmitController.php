@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,17 +30,15 @@ class SubmitController extends Controller
 
         // Extract the validated data
         $validatedData = $validator->validated();
-        $name = $validatedData['name'];
-        $email = $validatedData['email'];
-        $message = $validatedData['message'];
 
-        // Process the data (for example, log it)
-        \Log::info("Received submission: Name={$name}, Email={$email}, Message={$message}");
+        // Save to the database
+        $submission = Submission::create($validatedData);
 
         // Return a success response
         return response()->json([
             'status' => 'success',
-            'message' => 'Data received successfully'
+            'message' => 'Data received successfully',
+            'data' => $submission
         ], 200);
     }
 }
