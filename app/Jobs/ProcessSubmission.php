@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\SubmissionSaved;
 use App\Models\Submission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,6 +30,9 @@ class ProcessSubmission implements ShouldQueue
     public function handle(): void
     {
         // Save the data to the database
-        Submission::create($this->data);
+        $submission = Submission::create($this->data);
+
+        // Trigger the SubmissionSaved event
+        event(new SubmissionSaved($submission));
     }
 }
