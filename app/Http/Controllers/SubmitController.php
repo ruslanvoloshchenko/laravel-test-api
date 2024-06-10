@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessSubmission;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -31,14 +32,13 @@ class SubmitController extends Controller
         // Extract the validated data
         $validatedData = $validator->validated();
 
-        // Save to the database
-        $submission = Submission::create($validatedData);
+        // Dispatch the job to process the submission
+        ProcessSubmission::dispatch($validatedData);
 
         // Return a success response
         return response()->json([
             'status' => 'success',
-            'message' => 'Data received successfully',
-            'data' => $submission
+            'message' => 'Data received and is being processed'
         ], 200);
     }
 }
