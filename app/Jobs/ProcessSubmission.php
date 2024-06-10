@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ProcessSubmission implements ShouldQueue
 {
@@ -26,13 +27,26 @@ class ProcessSubmission implements ShouldQueue
 
     /**
      * Execute the job.
+     *
+     * @return void
      */
     public function handle(): void
     {
-        // Save the data to the database
-        $submission = Submission::create($this->data);
+        try {
+            // Save the data to the database
+            $submission = Submission::create($this->data);
 
-        // Trigger the SubmissionSaved event
-        event(new SubmissionSaved($submission));
+            // Trigger the SubmissionSaved event
+            event(new SubmissionSaved($submission));
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Error processing submission: ' . $e->getMessage(), [
+                'data' => $this->data,
+                'exception' => $e,
+            ]);
+
+            // Re-throw the exception to be handled by the queue worker
+            throw $e;
+        }
     }
 }

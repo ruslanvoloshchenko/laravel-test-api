@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProcessSubmission;
-use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class SubmitController extends Controller
 {
@@ -32,13 +32,27 @@ class SubmitController extends Controller
         // Extract the validated data
         $validatedData = $validator->validated();
 
-        // Dispatch the job to process the submission
-        ProcessSubmission::dispatch($validatedData);
+        try {
+            // Dispatch the job to process the submission
+            ProcessSubmission::dispatch($validatedData);
 
-        // Return a success response
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data received and is being processed'
-        ], 200);
+            // Return a success response
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data received and is being processed'
+            ], 200);
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Error dispatching ProcessSubmission job: ' . $e->getMessage(), [
+                'data' => $validatedData,
+                'exception' => $e,
+            ]);
+
+            // Return an error response
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while processing your request. Please try again later.'
+            ], 500);
+        }
     }
 }
